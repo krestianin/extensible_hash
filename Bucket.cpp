@@ -39,5 +39,5 @@ using std::vector;
     void Bucket::clear()
     {
         keys.clear();
-    } // Clear keys after redistribution
+    }
     

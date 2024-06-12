@@ -1,5 +1,6 @@
 #include "ExtensibleHashTable.h"
 #include <iostream>
+#include <unordered_map>
 #include <vector>
 using std::cout, std::vector;
 
@@ -14,14 +15,24 @@ ExtensibleHashTable::ExtensibleHashTable(const ExtensibleHashTable& other)
 {
     this->bucketCapacity = other.bucketCapacity;
     this->globalDepth = other.globalDepth;
-    directory.resize(1 << globalDepth); 
+    this->directory.resize(1 << globalDepth); 
 
+    std::unordered_map<Bucket*, Bucket*> copiedBuckets;
     for (int i = 0; i < (1 << globalDepth); i++) 
     {
-        this->directory[i] = new Bucket(globalDepth, bucketCapacity);
-        vector<int> keys = other.directory[i]->getKeys();
-        for (int key : keys) {
-            directory[i]->insert(key);
+        Bucket* oldBucket = other.directory[i];
+        if (copiedBuckets.find(oldBucket) == copiedBuckets.end()) 
+        {
+            this->directory[i] = new Bucket(other.directory[i]->getLocalDepth(), bucketCapacity);
+            vector<int> keys = other.directory[i]->getKeys();
+            for (int key : keys) {
+                directory[i]->insert(key);
+            }
+            copiedBuckets[oldBucket] = this->directory[i];
+        }
+        else
+        {
+            directory[i] = copiedBuckets[oldBucket];
         }
     }
 }
@@ -49,19 +60,30 @@ ExtensibleHashTable& ExtensibleHashTable::operator=(const ExtensibleHashTable& o
 {
     if (this != &other) {  
 
-          this->clear();
+        this->clear();
         directory.clear();  
         
-        bucketCapacity = other.bucketCapacity;
-        globalDepth = other.globalDepth;
+        this->bucketCapacity = other.bucketCapacity;
+        this->globalDepth = other.globalDepth;
+        this->directory.resize(1 << globalDepth); 
 
-        directory.resize(1 << globalDepth);
+
+        std::unordered_map<Bucket*, Bucket*> copiedBuckets;
         for (int i = 0; i < (1 << globalDepth); i++) 
         {
-            this->directory[i] = new Bucket(globalDepth, bucketCapacity);
-            vector<int> keys = other.directory[i]->getKeys();
-            for (int key : keys) {
-                directory[i]->insert(key);
+            Bucket* oldBucket = other.directory[i];
+            if (copiedBuckets.find(oldBucket) == copiedBuckets.end()) 
+            {
+                this->directory[i] = new Bucket(other.directory[i]->getLocalDepth(), bucketCapacity);
+                vector<int> keys = other.directory[i]->getKeys();
+                for (int key : keys) {
+                    directory[i]->insert(key);
+                }
+                copiedBuckets[oldBucket] = this->directory[i];
+            }
+            else
+            {
+                directory[i] = copiedBuckets[oldBucket];
             }
         }
     }
@@ -126,11 +148,13 @@ void ExtensibleHashTable::doubleDirectory() {
 void ExtensibleHashTable::insert(int key) {
     int index = hash(key);
     while (directory[index]->isFull()) {
-        // Handle splitting if needed
-        splitBucket(index);
 
+        if (std::all_of(directory[index]->getKeys().begin(), directory[index]->getKeys().end(), [key](int k) { return k == key; })) {
+            throw std::runtime_error("Cannot insert: all elements in the bucket are identical and the bucket is full.");
+        }
+        
+        splitBucket(index);
         index = hash(key);
-        this->print();
     }
     directory[index]->insert(key);
 }

@@ -5,8 +5,19 @@ using std::cout, std::endl;
 // fix if we insert bucketSize+1 identical elements.
 
 int main() {
-    ExtensibleHashTable hashTable(2); // Create a hash table with bucket capacity of 4
- std::cout << "Inserting keys..." << std::endl;
+    ExtensibleHashTable hashTable(2); // Create a hash table with bucket capacity of 2
+    std::cout << "Inserting keys..." << std::endl;
+    try
+    {
+        hashTable.insert(1);  
+        hashTable.insert(1);
+        hashTable.insert(1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
     hashTable.insert(1);  // Binary: ...0001
     //  hashTable.print();
     hashTable.insert(5);  // Binary: ...0101
@@ -25,34 +36,37 @@ int main() {
 
     // Print the table to check the state after additional insertion
     std::cout << "State of hash table after inserting key 29:" << std::endl;
-    hashTable.print();
+    // hashTable.print();
     cout << endl;
 
 
     // // Test insertions
     hashTable.insert(28);
-     hashTable.print();
+    //  hashTable.print();
     hashTable.insert(20);
-     hashTable.print();
+    //  hashTable.print();
     hashTable.insert(30);
-     hashTable.print();
+    //  hashTable.print();
     // hashTable.insert(40);
     //  hashTable.print();
     // hashTable.insert(50);
     // hashTable.print();
 
-    // cout << "\n";
-    // // ExtensibleHashTable hashTable2(hashTable);
-    // // hashTable2.print();
+    cout << "\nhashtable before removal";
+    ExtensibleHashTable hashTable2(hashTable);
+    hashTable2.print();
     // // Test find
-    // cout << "Finding 30: " << (hashTable.find(30) ? "Found" : "Not Found") << endl;
-    // cout << "Finding 100: " << (hashTable.find(100) ? "Found" : "Not Found") << endl;
-
+    cout << "Finding 30: " << (hashTable.find(30) ? "Found" : "Not Found") << endl;
+    cout << "Finding 100: " << (hashTable.find(100) ? "Found" : "Not Found") << endl;
+    cout << endl;
     // // Test removal
-    // hashTable.remove(30);
-    // cout << "After removing 30, find 30: " << (hashTable.find(30) ? "Found" : "Not Found") << endl;
-
-    // // Test print
-    // hashTable.print();
+    cout << "hashtable" << endl;
+    hashTable.remove(30);
+    hashTable.print();
+    cout << "After removing 30, find 30: " << (hashTable.find(30) ? "Found" : "Not Found") << endl;
+    cout << endl;
+    cout << "hashtable2" << endl;
+    hashTable2 = hashTable;
+    hashTable2.print();
     // return 0;
 }

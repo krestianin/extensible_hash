@@ -13,7 +13,7 @@ public:
     bool remove(int key);
     int getLocalDepth() const;
     void increaseDepth();
-    std::vector<int>& getKeys(); // Expose keys for redistribution in hash table class
+    std::vector<int>& getKeys(); 
     bool find(int key) const;
-    void clear(); // Clear keys after redistribution
+    void clear();
 };

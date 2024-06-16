@@ -7,10 +7,10 @@ private:
     int globalDepth;
     int bucketCapacity;
 
-    // Private helper methods
     int hash(int key) const;
     void splitBucket(int index);
     void doubleDirectory();
+    void clear();
 
 public:
     ExtensibleHashTable(int bucketSize = 4);
@@ -21,6 +21,5 @@ public:
     bool find(int key) const;
     void insert(int key);
     bool remove(int key);
-    void clear();
     void print() const;
 };

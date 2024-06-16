@@ -10,8 +10,8 @@ int main() {
     try
     {
         hashTable.insert(1);  
-        hashTable.insert(1);
-        hashTable.insert(1);
+        // hashTable.insert(1);
+        // hashTable.insert(1); 
     }
     catch(const std::exception& e)
     {

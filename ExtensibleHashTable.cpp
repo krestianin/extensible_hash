@@ -2,11 +2,11 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
-using std::cout, std::vector;
+using std::cout, std::endl, std::vector;
 
 ExtensibleHashTable::ExtensibleHashTable(int bucketSize) : bucketCapacity(bucketSize), globalDepth(1) {
     // Initialize directory with 2^globalDepth buckets
-    directory.resize(2); // nullptr
+    directory.resize(2); 
     for (int i = 0; i < 2; i++) {
         directory[i] = new Bucket(globalDepth, bucketCapacity);
     }
@@ -116,8 +116,8 @@ void ExtensibleHashTable::splitBucket(int bucketIndex) {
 
     // directory[bucketIndex % (1 << oldBucket->getLocalDepth())] = newBucket;
 
-    // cout << std::endl;
-    // cout  << bucketIndex % (1 << oldBucket->getLocalDepth()) << std::endl;
+    // cout << endl;
+    // cout  << bucketIndex % (1 << oldBucket->getLocalDepth()) << endl;
 
     for (size_t i = 0; i < directory.size(); ++i) 
     {
@@ -160,93 +160,43 @@ void ExtensibleHashTable::insert(int key) {
 }
 
 bool ExtensibleHashTable::remove(int key) {
-    int index = hash(key);  // Calculate the appropriate index for the key
+    int index = hash(key);  
     if (directory[index] != nullptr) {
         return directory[index]->remove(key);
     }
     return false;
 }
 
-#include <bitset>
-// #include <iomanip>
-int getKeyIndex(int key, int globalDepth) {
-    // Convert the key to binary using std::bitset
-    std::bitset<8> binary(key);  // Assuming a maximum of 32 bits for demonstration
-    
-    // Extract the rightmost 'globalDepth' bits from the binary representation
-    int mask = (1 << globalDepth) - 1;  // Creates a bitmask with globalDepth number of 1s at the least significant positions
-    int index = key & mask;  // Apply the bitmask to get the last 'globalDepth' bits as an integer
-
-    return index;
-}
-// void ExtensibleHashTable::print() const {
-//     std::cout << "Extensible Hash Table Structure:" << std::endl;
-//     std::cout << "Global Depth: " << globalDepth << std::endl;
-
-//     for (size_t i = 0; i < directory.size(); ++i) {
-//         Bucket* currentBucket = directory[i];
-
-//         std::bitset<4> index(i);
-//         // Print the index and the pointer in hexadecimal to show where it points
-//         cout << "Index " << index << ": ";
-//         cout << std::hex << std::showbase << reinterpret_cast<uintptr_t>(currentBucket) << std::dec;
-
-//         // Check if the bucket is not null and print its contents
-//             const vector<int>& keys = currentBucket->getKeys();
-//             cout << " --> [";
-//             for (size_t j = 0; j < keys.size(); j++) {
-//                 if (j > 0) cout << ", ";
-//                 std::bitset<16> binaryKey(keys[j]);
-//                 cout << binaryKey;
-//             }
-//             cout << "] (Local Depth: " << currentBucket->getLocalDepth() << ")";
-
-//         cout << std::endl;
-//     }
-// }
-
-
-#include <bitset>
-#include <set>
-
 void ExtensibleHashTable::print() const {
-    std::set<const Bucket*> printedBuckets;  // Set to track printed buckets
-
-    std::cout << "Extensible Hash Table Structure:" << std::endl;
-    std::cout << "Global Depth: " << globalDepth << std::endl;
+    vector<const Bucket*> printedBuckets;  // Vector to track printed buckets
 
     for (size_t i = 0; i < directory.size(); ++i) {
         Bucket* currentBucket = directory[i];
 
-        std::bitset<4> index(i);  // Use bitset to format the index nicely
-        std::cout << "Index " << index << ": ";
+        cout << i << ": ";
 
-        // Print the bucket's pointer in hexadecimal only if it has not been printed yet
-        if (printedBuckets.find(currentBucket) == printedBuckets.end()) {
-            std::cout << std::hex << std::showbase << reinterpret_cast<uintptr_t>(currentBucket) << std::dec;
+        if (std::find(printedBuckets.begin(), printedBuckets.end(), currentBucket) == printedBuckets.end()) {
+            cout << std::hex << std::showbase << reinterpret_cast<uintptr_t>(currentBucket) << std::dec;
 
-            // Check if the bucket is not null and print its contents
             if (currentBucket != nullptr) {
-                const std::vector<int>& keys = currentBucket->getKeys();
-                std::cout << " --> [";
+                const vector<int>& keys = currentBucket->getKeys();
+                cout << " --> [";
                 for (size_t j = 0; j < keys.size(); j++) {
-                    if (j > 0) std::cout << ", ";
-                    std::bitset<16> binaryKey(keys[j]);  // Display key in binary
-                    std::cout << binaryKey;
+                    if (j > 0) cout << ", ";
+                    cout << keys[j];  
                 }
-                for (size_t j = keys.size(); j <= bucketCapacity - 1; j++) {
-                    if (j == 0)
-                        cout << " - ";
-                    else
-                        cout << ", - ";
+                if (keys.size() == 0)
+                    cout << " - ";
+                for (size_t j = keys.size(); j < bucketCapacity; j++) {
+                    cout << ", - ";
                 }
-                std::cout << "] (" << currentBucket->getLocalDepth() << ")";
-                printedBuckets.insert(currentBucket);  // Mark this bucket as printed
-                    std::cout << std::endl;
+                cout << "] (" << currentBucket->getLocalDepth() << ")";
+                printedBuckets.push_back(currentBucket);  
+                cout << endl;
             }
         } else {
-            std::cout << std::hex << std::showbase << reinterpret_cast<uintptr_t>(currentBucket) << std::dec;
-            std::cout << std::endl;
+            cout << currentBucket;
+            cout << endl;
         }
     }
 }
